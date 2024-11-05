@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed&family=PT+Sans+Narrow&display=swap');
+nav {
+    font-family: 'PT Sans Narrow', sans-serif;
+    font-size: 17px;
+}
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap');
+.logo {
+    font-family: 'Dancing Script', cursive;
+}
