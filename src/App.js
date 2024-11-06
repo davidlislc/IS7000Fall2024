@@ -11,7 +11,7 @@ import Profile from './pages/profile/Profile';
 
 function App() {
   return (
-    <div className="App bg-[#1a1a1a] w-full h-screen">
+    <div className="App  w-full h-screen">
       <Navbar />
       <Routes>
         <Route path='/' element={<Home />} />
