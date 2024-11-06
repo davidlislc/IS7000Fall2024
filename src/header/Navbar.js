@@ -40,6 +40,7 @@ function Navbar() {
         <Link to='/subscription'><li className='hover:text-teal-700'>Subscriptions</li></Link>
         <Link to='/user'><li className='hover:text-teal-700'>User</li></Link>
         <Link to='/profile'><li className='hover:text-teal-700'>Profile</li></Link>
+        <Link to='/profile'><li className='hover:text-teal-700'>Logout</li></Link>
 
         <Link to='/wallet'><li className='hover:text-teal-700'>Wallet</li></Link>
         <Link to='/contact'><li className='hover:text-teal-700'>Contact Us</li></Link>
