@@ -1,11 +1,15 @@
-import React from 'react'
+import React from 'react';
+import DeleteSubscription from './DeleteSubscription';
 
 function Subscription() {
   return (
-    <div className='text-white flex justify-center items-center w-full h-screen'>
-        <h1 className='text-4xl'>Subscriptions holder</h1>
+    <div className="bg-gray-100 min-h-screen flex flex-col items-center p-8">
+      <h1 className="text-4xl font-bold mb-8 text-center text-black">Manage Subscriptions</h1>
+      <div className="w-full max-w-2xl bg-white p-6 rounded-lg shadow-lg">
+        <DeleteSubscription />
+      </div>
     </div>
-  )
+  );
 }
 
-export default Subscription
+export default Subscription;
