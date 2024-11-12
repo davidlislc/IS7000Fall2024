@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
-
 import './Login.css';
+
 async function loginUser(credentials) {
   console.log("hello")
   console.log(JSON.stringify(credentials))
@@ -24,8 +24,8 @@ export default function Login({ setToken }) {
   }
   return (
     <div className="login-wrapper">
-      <h1>Please Log In</h1>
-      <form onSubmit={handleSubmit}>
+      {/* <h1>Please Log In</h1> */}
+      {/* <form onSubmit={handleSubmit}>
         <label>
           <p>Username</p>
           <input type="text" onChange={e => setUserName(e.target.value)} />
@@ -37,7 +37,7 @@ export default function Login({ setToken }) {
         <div>
           <button type="submit">Submit</button>
         </div>
-      </form>
+      </form> */}
     </div>
   )
 }
