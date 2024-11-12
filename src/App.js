@@ -8,11 +8,15 @@ import Subscription from './pages/subscription/Subscription';
 import Wallet from './pages/wallet/Wallet';
 import User from './pages/user/User';
 import Profile from './pages/profile/Profile';
+import Login from './pages/user/Login';
+import { useState } from 'react';
 
 function App() {
+  const [token, setToken] = useState(null);
+
   return (
-    <div className="App bg-rose-400	  w-full h-screen" >
-      <Navbar />
+    <div className="App bg-rose-400 w-full h-screen">
+      <Navbar token={token} setToken={setToken} />
       <Routes>
         <Route path='/' element={<Home />} />
         <Route path='/markets' element={<MarketOverview />} />
@@ -21,8 +25,8 @@ function App() {
         <Route path='/user' element={<User />} />
         <Route path='/profile' element={<Profile />} />
         <Route path='/contact' element={<Contact />} />
+        <Route path='/login' element={<Login setToken={setToken} />} />
       </Routes>
-
     </div>
   );
 }
