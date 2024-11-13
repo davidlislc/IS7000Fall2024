@@ -8,6 +8,7 @@ import Subscription from './pages/subscription/Subscription';
 import Wallet from './pages/wallet/Wallet';
 import User from './pages/user/User';
 import Profile from './pages/profile/Profile';
+import Subscriptionadmin from './pages/admin/Subscriptionadmin';
 
 function App() {
   return (
@@ -17,6 +18,9 @@ function App() {
         <Route path='/' element={<Home />} />
         <Route path='/markets' element={<MarketOverview />} />
         <Route path='/subscription' element={<Subscription />} />
+        <Route path='/subscriptionadmin' element={ <Subscriptionadmin />} />
+      
+       
         <Route path='/wallet' element={<Wallet />} />
         <Route path='/user' element={<User />} />
         <Route path='/profile' element={<Profile />} />

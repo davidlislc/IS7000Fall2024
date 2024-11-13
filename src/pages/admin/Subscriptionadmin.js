@@ -38,10 +38,9 @@ const SubscriptionAdminPage = () => {
 
   return (
     <div className="p-8 bg-gray-100 min-h-screen">
-      subscription
-      {/* <h1 className="text-2xl font-bold mb-4 text-gray-800">Subscription Admin Panel</h1>
+      <h1 className="text-2xl font-bold mb-4 text-gray-800">Subscription Admin Panel</h1>
 
-      
+      {/* Search / Filter */}
       <div className="mb-4">
         <input
           type="text"
@@ -52,7 +51,7 @@ const SubscriptionAdminPage = () => {
         />
       </div>
 
-      
+      {/* Subscription Table */}
       <div className="overflow-auto rounded-lg shadow-md">
         <table className="min-w-full bg-white rounded-lg">
           <thead className="bg-blue-500 text-white">
@@ -91,7 +90,7 @@ const SubscriptionAdminPage = () => {
             ))}
           </tbody>
         </table>
-      </div> */}
+      </div>
     </div>
   );
 };
