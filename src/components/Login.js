@@ -1,34 +1,48 @@
-// src/components/Login.js
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
+import axios from 'axios';
 
-function Login() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+import '../pages/user/Login.css';
 
+async function loginUser(credentials) {
+  console.log("hello")
+  console.log(JSON.stringify(credentials))
+  const response = await axios.post('http://3.218.8.102/api/authenticate', credentials);
+  const { id_token } = response.data;
+  return id_token;
+}
+export default function Login({ setToken }) {
+  const [username, setUserName] = useState();
+  const [password, setPassword] = useState();
+  const handleSubmit = async e => {
+    e.preventDefault();
+    const token = await loginUser({
+      username,
+      password
+    });
+    console.log(token)
+    setToken(token);
+  }
   return (
-    <div className="max-w-sm mx-auto bg-white p-6 rounded shadow-md">
-      <h2 className="text-lg font-bold text-center mb-4">Login</h2>
-      <form className="space-y-4">
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          className="w-full p-2 border rounded"
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full p-2 border rounded"
-        />
-        <button type="submit" className="w-full p-2 bg-blue-500 text-white rounded">
-          Submit
-        </button>
+    <div className="login-wrapper">
+      <h1>Please Log In</h1>
+      <form onSubmit={handleSubmit}>
+        <label>
+          <p>Username</p>
+          <input type="text" onChange={e => setUserName(e.target.value)} />
+        </label>
+        <label>
+          <p>Password</p>
+          <input type="password" onChange={e => setPassword(e.target.value)} />
+        </label>
+        <div>
+          <button type="submit">Submit</button>
+        </div>
       </form>
     </div>
-  );
+  )
 }
 
-export default Login;
+Login.propTypes = {
+  setToken: PropTypes.func.isRequired
+};
