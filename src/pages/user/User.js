@@ -8,7 +8,8 @@ function Users() {
   ];
 
   return (
-    <div className="bg-white shadow-md rounded-lg px-8 pt-6 pb-8 mb-4 max-w-md mx-auto">
+    <div className="p-4">
+      <div className="bg-white shadow-md rounded-lg px-8 pt-6 pb-8 mb-4 max-w-md mx-auto">
       <h3 className="text-2xl font-semibold mb-4 text-center">Registered Users</h3>
       <ul>
         {users.map((user) => (
@@ -18,6 +19,7 @@ function Users() {
           </li>
         ))}
       </ul>
+    </div>
     </div>
   );
 }
