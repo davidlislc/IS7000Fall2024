@@ -1,177 +1,129 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import ReportTransactionCard from "./reporttransaction";
 
-const dummyData = [
-  { company: 'Microsoft', amount: 100, date: '2023-01-01' },
-  { company: 'Apple', amount: 200, date: '2023-01-02' },
-  { company: 'Amazon', amount: 300, date: '2023-01-03' },
-  { company: 'Google', amount: 400, date: '2023-01-04' },
-  { company: 'Facebook', amount: 500, date: '2023-01-05' },
-  { company: 'IBM', amount: 600, date: '2023-01-06' },
-  { company: 'Oracle', amount: 700, date: '2023-01-07' },
-  { company: 'SAP', amount: 800, date: '2023-01-08' },
-  { company: 'Salesforce', amount: 900, date: '2023-01-09' },
-  { company: 'Adobe', amount: 1000, date: '2023-01-10' },
-  { company: 'Intel', amount: 1100, date: '2023-01-11' },
-  { company: 'Cisco', amount: 1200, date: '2023-01-12' },
-  { company: 'HP', amount: 1300, date: '2023-01-13' },
-  { company: 'Dell', amount: 1400, date: '2023-01-14' },
-  { company: 'VMware', amount: 1500, date: '2023-01-15' },
-  { company: 'Intuit', amount: 1600, date: '2023-01-16' },
-  { company: 'ServiceNow', amount: 1700, date: '2023-01-17' },
-  { company: 'Square', amount: 1800, date: '2023-01-18' },
-  { company: 'Shopify', amount: 1900, date: '2023-01-19' },
-  { company: 'Workday', amount: 2000, date: '2023-01-20' },
-];
-const initialFailedTransactions = [
-  { company: 'Microsoft', amount: 100, date: '2023-01-01', reason: 'Insufficient funds' },
-  { company: 'Apple', amount: 200, date: '2023-01-02', reason: 'Card expired' },
-  { company: 'Amazon', amount: 300, date: '2023-01-03', reason: 'Network error' },
-  { company: 'Google', amount: 400, date: '2023-01-04', reason: 'Insufficient funds' },
-  { company: 'Facebook', amount: 500, date: '2023-01-05', reason: 'Card expired' },
-];
+const Wallet = () => {
+  // Simulated transactions data
+  const transactions = Array.from({ length: 30 }, (_, index) => ({
+    id: index + 1,
+    description: `Transaction ${index + 1}`,
+    amount: (Math.random() * 100).toFixed(2),
+    status: Math.random() > 0.7 ? "Failed" : "Success",
+  }));
 
-function Wallet() {
+  // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  const transactionsPerPage = 5;
+  const transactionsPerPage = 10;
+  const totalPages = Math.ceil(transactions.length / transactionsPerPage);
 
-  const indexOfLastTransaction = currentPage * transactionsPerPage;
-  const indexOfFirstTransaction = indexOfLastTransaction - transactionsPerPage;
-  const currentTransactions = dummyData.slice(indexOfFirstTransaction, indexOfLastTransaction);
+  // Pagination logic
+  const startIndex = (currentPage - 1) * transactionsPerPage;
+  const currentTransactions = transactions.slice(
+    startIndex,
+    startIndex + transactionsPerPage
+  );
 
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  const failedTransactions = transactions.filter(
+    (transaction) => transaction.status === "Failed"
+  );
 
-  const [failedTransactions, setFailedTransactions] = useState(initialFailedTransactions);
-  const [newCompany, setNewCompany] = useState('');
-  const [newAmount, setNewAmount] = useState('');
-  const [newDate, setNewDate] = useState('');
-  const [newReason, setNewReason] = useState('');
-
-  const addFailedTransaction = () => {
-    const newTransaction = {
-      company: newCompany,
-      amount: parseFloat(newAmount),
-      date: newDate,
-      reason: newReason,
-    };
-    setFailedTransactions([...failedTransactions, newTransaction]);
-    setNewCompany('');
-    setNewAmount('');
-    setNewDate('');
-    setNewReason('');
+  // Pagination controls
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
   };
 
   return (
-    <>
+    <div className="min-h-screen bg-gray-100 py-8 px-4">
+      {/* Page Header */}
+      <div className="max-w-7xl mx-auto">
+        <h1 className="text-3xl font-bold text-gray-800 text-center mb-6">
+          Wallet Transactions
+        </h1>
+      </div>
 
-      <div className='text-black flex flex-col items-center w-full h-screen p-4 bg-white'>
-
-        <h1 className='text-4xl mb-4'>Wallet Transactions</h1>
-        <div className='w-full max-w-4xl'>
-          {currentTransactions.map((transaction, index) => (
-            <div key={index} className='bg-gray-800 p-4 mb-2 rounded'>
-              <p>Company: {transaction.company}</p>
-              <p>Amount: ${transaction.amount}</p>
-              <p>Date: {transaction.date}</p>
+      {/* Transactions Section */}
+      <div className="max-w-7xl mx-auto bg-white rounded-lg shadow-md p-6">
+        <h2 className="text-xl font-semibold text-gray-800 mb-4">
+          Transactions (Page {currentPage} of {totalPages})
+        </h2>
+        <div className="space-y-4">
+          {currentTransactions.map((transaction) => (
+            <div
+              key={transaction.id}
+              className={`p-4 border rounded-lg ${
+                transaction.status === "Failed"
+                  ? "bg-red-50 border-red-300"
+                  : "bg-green-50 border-green-300"
+              }`}
+            >
+              <p className="text-gray-800 font-medium">
+                {transaction.description}
+              </p>
+              <p className="text-gray-600">
+                Amount: <span className="font-bold">${transaction.amount}</span>
+              </p>
+              <p
+                className={`font-bold ${
+                  transaction.status === "Failed"
+                    ? "text-red-600"
+                    : "text-green-600"
+                }`}
+              >
+                Status: {transaction.status}
+              </p>
             </div>
           ))}
         </div>
-        <div className='flex justify-center mt-4'>
-          {[...Array(Math.ceil(dummyData.length / transactionsPerPage)).keys()].map(number => (
-            <button
-              key={number}
-              onClick={() => paginate(number + 1)}
-              className={`px-4 py-2 mx-1 ${currentPage === number + 1 ? 'bg-blue-500' : 'bg-gray-700'} rounded`}
-            >
-              {number + 1}
-            </button>
+
+        {/* Pagination Controls */}
+        <div className="flex justify-between items-center mt-6">
+          <button
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+          >
+            Previous
+          </button>
+          <p className="text-gray-600">
+            Page {currentPage} of {totalPages}
+          </p>
+          <button
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </button>
+        </div>
+      </div>
+
+      {/* Failed Transactions Section */}
+      <div className="max-w-7xl mx-auto bg-red-50 border border-red-300 rounded-lg shadow-md p-6 mt-8">
+        <h2 className="text-xl font-semibold text-red-800 mb-4">
+          Failed Transactions
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {failedTransactions.slice(0, 9).map((transaction) => (
+            <div key={transaction.id} className="p-4 bg-white rounded-lg shadow">
+              <p className="text-gray-800 font-medium">
+                {transaction.description}
+              </p>
+              <p className="text-gray-600">
+                Amount: <span className="font-bold">${transaction.amount}</span>
+              </p>
+              <p className="text-red-600 font-bold">Status: {transaction.status}</p>
+            </div>
           ))}
         </div>
       </div>
-      <div>
-        <h1 className='text-4xl mb-4'>Failed Transactions Overview</h1>
-        <div className='w-full max-w-4xl'>
-          <div className='bg-gray-200 p-4 mb-4 rounded'>
-            <h2 className='text-2xl mb-2'>Failed Transactions</h2>
-            {failedTransactions.map((transaction, index) => (
-              <div key={index} className='bg-gray-100 p-4 mb-2 rounded'>
-                <p>Company: {transaction.company}</p>
-                <p>Amount: ${transaction.amount}</p>
-                <p>Date: {transaction.date}</p>
-                <p>Reason: {transaction.reason}</p>
-              </div>
-            ))}
-          </div>
-          <div className='bg-gray-200 p-4 mb-4 rounded'>
-            <h2 className='text-2xl mb-2'>Add New Failed Transaction</h2>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                addFailedTransaction();
-              }}
-            >
-              <div className='mb-4'>
-                <label className='block text-gray-700 text-sm font-bold mb-2' htmlFor='company'>
-                  Company
-                </label>
-                <input
-                  type='text'
-                  id='company'
-                  value={newCompany}
-                  onChange={(e) => setNewCompany(e.target.value)}
-                  className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
-                  required
-                />
-              </div>
-              <div className='mb-4'>
-                <label className='block text-gray-700 text-sm font-bold mb-2' htmlFor='amount'>
-                  Amount
-                </label>
-                <input
-                  type='number'
-                  id='amount'
-                  value={newAmount}
-                  onChange={(e) => setNewAmount(e.target.value)}
-                  className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
-                  required
-                />
-              </div>
-              <div className='mb-4'>
-                <label className='block text-gray-700 text-sm font-bold mb-2' htmlFor='date'>
-                  Date
-                </label>
-                <input
-                  type='date'
-                  id='date'
-                  value={newDate}
-                  onChange={(e) => setNewDate(e.target.value)}
-                  className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
-                  required
-                />
-              </div>
-              <div className='mb-4'>
-                <label className='block text-gray-700 text-sm font-bold mb-2' htmlFor='reason'>
-                  Reason
-                </label>
-                <input
-                  type='text'
-                  id='reason'
-                  value={newReason}
-                  onChange={(e) => setNewReason(e.target.value)}
-                  className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
-                  required
-                />
-              </div>
-              <button
-                type='submit'
-                className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline'
-              >
-                Add Failed Transaction
-              </button>
-            </form>
-          </div>
-        </div>
+
+      {/* Report Failed Transactions */}
+      <div className="p-4">
+      < ReportTransactionCard />
       </div>
-    </>
+    </div>
   );
-}
+};
+
 export default Wallet;
