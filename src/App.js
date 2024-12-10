@@ -18,6 +18,8 @@ import SignUp from './pages/user/signup';
 import Batch from './pages/admin/batch/Batch';
 import Logs from './pages/admin/Logs';
 import { setAuthToken } from './pages/user/AuthToken';
+import GiftCards from '../src/wallet/giftcardlist';
+
 
 function App() {
     // Check JWT token and set it globally for axios
@@ -41,6 +43,7 @@ function App() {
                 <Route path="/signup" element={<SignUp />} />
                 <Route path="/batch" element={<Batch />} />
                 <Route path="/log" element={<Logs />} />
+                <Route path="/giftcardlist" element={<GiftCards />} />
 
                 {/* Role-Based Pages */}
                 <Route path="/user" element={<UserRolePage />} />

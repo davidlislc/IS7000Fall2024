@@ -16,7 +16,7 @@ function GiftCardList({ onViewGiftCard }) {
 
         const response = await axios.get('http://3.218.8.102/api/giftcards?page=0&size=20&sort=id,asc&cacheBuster=1732246285725', {
           headers: {
-            'Authorization': Bearer ${token},
+            'Authorization': 'Bearer ${token}',
             'Content-Type': 'application/json'
           }
         });

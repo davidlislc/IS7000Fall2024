@@ -18,6 +18,7 @@ export default function Login({ setToken }) {
       username,
       password
     });
+  
     setToken(token);
     localStorage.setItem("token", token);
     setAuthToken(token);

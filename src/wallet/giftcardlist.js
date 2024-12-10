@@ -10,17 +10,12 @@ function GiftCardList({ onViewGiftCard }) {
     const fetchGiftCards = async () => {
       try {
         const token = localStorage.getItem('token');
+        console.log(token);
         if (!token) {
           throw new Error('No token found');
         }
 
-        const response = await axios.get('http://3.218.8.102/api/giftcards?page=0&size=20&sort=id,asc&cacheBuster=1732246285725', {
-          headers: {
-            'Authorization': Bearer ${token},
-            'Content-Type': 'application/json'
-          }
-        });
-
+        const response = await axios.get('http://3.218.8.102/api/giftcards?page=0&size=20&sort=id');
         if (response.status !== 200) {
           throw new Error('Network response was not ok');
         }
@@ -47,7 +42,7 @@ function GiftCardList({ onViewGiftCard }) {
   }
 
   return (
-    <div className="w-full max-w-2xl bg-white p-6 rounded-lg shadow-lg mt-4">
+    <div className="min-h-screen bg-white rounded-lg text-black flex flex-col items-center p-6">
       <h2 className="text-2xl font-bold mb-4">Gift Cards</h2>
       <ul>
         {giftCards.map((card) => (

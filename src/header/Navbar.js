@@ -24,6 +24,10 @@ function Navbar() {
           <Link to='/profile'><li>Profile</li></Link>
 
           <Link to='/wallet'><li>Wallet</li></Link>
+
+          
+          <Link to='/giftcardlist'><li>GiftCards</li></Link>
+
           <Link to='/contact'><li>Contact Us</li></Link>
 
           <Link to='/signup'><li>SignUp</li></Link>

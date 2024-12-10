@@ -9,9 +9,7 @@ const Logs = () => {
         const fetchData = async () => {
             setLoading(true);
             try {
-                const {data: response} = await axios.get('http://' +
-                    SERVERIP +
-                    '/api/insyte-logs?page=0&size=20&sort=id,asc');
+                const {data: response} = await axios.get('http://3.218.8.102/api/insyte-logs?page=0&size=20&sort=id');
                 setData(response);
             } catch (error) {
                 console.error(error.message);
