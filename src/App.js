@@ -18,6 +18,7 @@ import SignUp from './pages/user/signup';
 import Batch from './pages/admin/batch/Batch';
 import Logs from './pages/admin/Logs';
 import { setAuthToken } from './pages/user/AuthToken';
+import WalletAdmin from './pages/admin/batch/WalletAdmin';
 
 function App() {
     // Check JWT token and set it globally for axios
@@ -35,7 +36,9 @@ function App() {
                 <Route path="/markets" element={<MarketOverview />} />
                 <Route path="/subscription" element={<Subscription />} />
                 <Route path="/Subscriptionadminhome" element={<Subscriptionadminhome />} />
+                
                 <Route path="/wallet" element={<Wallet />} />
+                <Route path="/WalletAdmin" element={<WalletAdmin />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/signup" element={<SignUp />} />

@@ -24,12 +24,13 @@ function Navbar() {
           <Link to='/profile'><li>Profile</li></Link>
 
           <Link to='/wallet'><li>Wallet</li></Link>
+          <Link to='/WalletAdmin'><li>Wallet Admin</li></Link>
           <Link to='/contact'><li>Contact Us</li></Link>
 
           <Link to='/signup'><li>SignUp</li></Link>
 
           <Link to='/batch'><li>Batch</li></Link>
-            <Link to ='/log'><li>Logging</li> </Link>
+          <Link to='/log'><li>Logging</li> </Link>
 
         </ul>
         {/* Hamburger or Close Icon */}
@@ -56,7 +57,7 @@ function Navbar() {
           <Link to='/contact'><li className='hover:text-teal-700'>Contact Us</li></Link>
           <Link to='/batch'><li className='hover:text-teal-700'>Batch</li></Link>
           <Link to='/signup'><li className='hover:text-teal-700'>Signup</li></Link>
-            <Link to='/log'><li className='hover:text-teal-700'>Logging</li></Link>
+          <Link to='/log'><li className='hover:text-teal-700'>Logging</li></Link>
         </ul>
       </nav>
       {token == null ? <Login setToken={setToken} /> : null}
