@@ -1,130 +1,147 @@
-import React, { useState } from "react";
-import ReportTransactionCard from "./reporttransaction";
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import WalletDetails from './WalletDetails';
+import EditWallet from './EditWallet';
+import GiftCardList from './GiftCardList';
+import GiftCardDetails from './GiftCardDetails';
+import AddGiftCard from './AddGiftCard';
 
+function Wallet() {
+  const [isEditing, setIsEditing] = useState(false);
+  const [showGiftCards, setShowGiftCards] = useState(false);
+  const [viewingGiftCardId, setViewingGiftCardId] = useState(null);
+  const [isAddingGiftCard, setIsAddingGiftCard] = useState(false);
+  const [walletData, setWalletData] = useState(null);
+  const [token, setToken] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-const Wallet = () => {
-  // Simulated transactions data
-  const transactions = Array.from({ length: 30 }, (_, index) => ({
-    id: index + 1,
-    description: `Transaction ${index + 1}`,
-    amount: (Math.random() * 100).toFixed(2),
-    status: Math.random() > 0.7 ? "Failed" : "Success",
-  }));
+  useEffect(() => {
+    const authenticateAndFetchDetails = async () => {
+      setLoading(true);
+      try {
+        const token = await authenticate();
+        setToken(token);
+        if (token) {
+          await fetchWalletDetails(token);
+        }
+      } catch (error) {
+        console.error('Error during authentication and fetching details:', error);
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  // Pagination state
-  const [currentPage, setCurrentPage] = useState(1);
-  const transactionsPerPage = 10;
-  const totalPages = Math.ceil(transactions.length / transactionsPerPage);
+    authenticateAndFetchDetails();
+  }, []);
 
-  // Pagination logic
-  const startIndex = (currentPage - 1) * transactionsPerPage;
-  const currentTransactions = transactions.slice(
-    startIndex,
-    startIndex + transactionsPerPage
-  );
+  const authenticate = async () => {
+    try {
+      const response = await axios.post('http://3.218.8.102/api/authenticate', {
+        username: 'user',
+        password: 'user',
+        rememberMe: false
+      }, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
 
-  const failedTransactions = transactions.filter(
-    (transaction) => transaction.status === "Failed"
-  );
-
-  // Pagination controls
-  const handlePageChange = (page) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
+      const token = response.data.id_token;
+      console.log('Token:', token); // Log the token
+      localStorage.setItem('token', token); // Store the token in localStorage
+      return token; // Return the token
+    } catch (error) {
+      console.error('Error authenticating:', error);
+      throw new Error('Authentication failed');
     }
   };
 
+  const fetchWalletDetails = async (token) => {
+    try {
+      const response = await axios.get('http://3.218.8.102/api/wallets/1', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      console.log('Response status:', response.status); // Log the response status
+      console.log('Wallet data:', response.data); // Log the wallet data
+      setWalletData(response.data);
+    } catch (error) {
+      console.error('Error fetching wallet details:', error);
+      throw new Error('Fetching wallet details failed');
+    }
+  };
+
+  const handleEditClick = () => setIsEditing(true);
+
+  const handleSaveClick = async () => {
+    setIsEditing(false);
+    setIsAddingGiftCard(false);
+    if (token) {
+      await fetchWalletDetails(token); // Refresh wallet details after saving
+    }
+  };
+
+  const handleGiftCardClick = () => setShowGiftCards(true);
+
+  const handleAddGiftCardClick = () => setIsAddingGiftCard(true);
+
+  const handleViewGiftCard = (id) => setViewingGiftCardId(id);
+
+  const handleBack = () => setViewingGiftCardId(null);
+
+  const handleUpdateClick = () => {
+    window.location.href = 'http://3.218.8.102/wallet/1/edit';
+  };
+
+  if (loading) {
+    return <div className="text-center mt-6">Loading...</div>;
+  }
+
+  if (error) {
+    return <div className="text-center mt-6 text-red-600">Error: {error}</div>;
+  }
+
   return (
-    <div className="min-h-screen bg-gray-100 py-8 px-4">
-      {/* Page Header */}
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-800 text-center mb-6">
-          Wallet Transactions
-        </h1>
+    <div className="bg-gray-100 min-h-screen flex flex-col items-center p-8">
+      <h1 className="text-4xl font-bold mb-8 text-center text-black">Wallet</h1>
+
+      {isEditing ? (
+        <EditWallet onSave={handleSaveClick} isAddingGiftCard={isAddingGiftCard} walletData={walletData} />
+      ) : isAddingGiftCard ? (
+        <AddGiftCard onSave={handleSaveClick} walletData={walletData} />
+      ) : (
+        <WalletDetails walletData={walletData} />
+      )}
+
+      <div className="mt-4">
+        <button onClick={handleEditClick} className="bg-blue-500 text-white px-4 py-2 rounded">
+          Edit Wallet Info
+        </button>
+        <button onClick={handleGiftCardClick} className="bg-green-500 text-white px-4 py-2 rounded ml-4">
+          List Gift Cards
+        </button>
+        <button onClick={handleAddGiftCardClick} className="bg-yellow-500 text-white px-4 py-2 rounded ml-4">
+          Add Gift Card
+        </button>
+        <button onClick={handleUpdateClick} className="bg-purple-500 text-white px-4 py-2 rounded ml-4">
+          Update Wallet
+        </button>
       </div>
 
-      {/* Transactions Section */}
-      <div className="max-w-7xl mx-auto bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-xl font-semibold text-gray-800 mb-4">
-          Transactions
-        </h2>
-        <div className="space-y-4">
-          {currentTransactions.map((transaction) => (
-            <div
-              key={transaction.id}
-              className={`p-4 border rounded-lg ${
-                transaction.status === "Failed"
-                  ? "bg-red-50 border-red-300"
-                  : "bg-green-50 border-green-300"
-              }`}
-            >
-              <p className="text-gray-800 font-medium">
-                {transaction.description}
-              </p>
-              <p className="text-gray-600">
-                Amount: <span className="font-bold">${transaction.amount}</span>
-              </p>
-              <p
-                className={`font-bold ${
-                  transaction.status === "Failed"
-                    ? "text-red-600"
-                    : "text-green-600"
-                }`}
-              >
-                Status: {transaction.status}
-              </p>
-            </div>
-          ))}
-        </div>
+      {showGiftCards && !viewingGiftCardId && (
+        <GiftCardList onViewGiftCard={handleViewGiftCard} />
+      )}
 
-        {/* Pagination Controls */}
-        <div className="flex justify-between items-center mt-6">
-          <button
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-          >
-            Previous
-          </button>
-          <p className="text-gray-600">
-            Page {currentPage} of {totalPages}
-          </p>
-          <button
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
-          >
-            Next
-          </button>
-        </div>
-      </div>
-
-      {/* Failed Transactions Section */}
-      <div className="max-w-7xl mx-auto bg-red-50 border border-red-300 rounded-lg shadow-md p-6 mt-8">
-        <h2 className="text-xl font-semibold text-red-800 mb-4">
-          Failed Transactions
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {failedTransactions.slice(0, 9).map((transaction) => (
-            <div key={transaction.id} className="p-4 bg-white rounded-lg shadow">
-              <p className="text-gray-800 font-medium">
-                {transaction.description}
-              </p>
-              <p className="text-gray-600">
-                Amount: <span className="font-bold">${transaction.amount}</span>
-              </p>
-              <p className="text-red-600 font-bold">Status: {transaction.status}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Report Failed Transactions */}
-      <div className="p-4">
-      < ReportTransactionCard />
-      </div>
+      {viewingGiftCardId && (
+        <GiftCardDetails giftCardId={viewingGiftCardId} onBack={handleBack} />
+      )}
     </div>
   );
-};
+}
 
 export default Wallet;
