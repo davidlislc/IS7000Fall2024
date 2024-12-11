@@ -1,130 +1,185 @@
-import React, { useState } from "react";
-import ReportTransactionCard from "./reporttransaction";
+import React, { useEffect, useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { configureStore, createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { BrowserRouter as Router, Route, Routes, Link, useNavigate, useParams } from 'react-router-dom';
+import axios from 'axios';
 
+// Redux slice with async thunk for fetching wallet details
+const walletSlice = createSlice({
+  name: 'wallet',
+  initialState: {
+    wallet: null,
+    loading: false,
+    error: null,
+  },
+  reducers: {
+    setWallet(state, action) {
+      state.wallet = action.payload;
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchWalletDetails.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchWalletDetails.fulfilled, (state, action) => {
+        state.loading = false;
+        state.wallet = action.payload;
+      })
+      .addCase(fetchWalletDetails.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+  },
+});
 
-const Wallet = () => {
-  // Simulated transactions data
-  const transactions = Array.from({ length: 30 }, (_, index) => ({
-    id: index + 1,
-    description: `Transaction ${index + 1}`,
-    amount: (Math.random() * 100).toFixed(2),
-    status: Math.random() > 0.7 ? "Failed" : "Success",
-  }));
+export const { setWallet } = walletSlice.actions;
 
-  // Pagination state
-  const [currentPage, setCurrentPage] = useState(1);
-  const transactionsPerPage = 10;
-  const totalPages = Math.ceil(transactions.length / transactionsPerPage);
+export const fetchWalletDetails = createAsyncThunk(
+  'wallet/fetchDetails',
+  async (_, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No token found');
+      }
 
-  // Pagination logic
-  const startIndex = (currentPage - 1) * transactionsPerPage;
-  const currentTransactions = transactions.slice(
-    startIndex,
-    startIndex + transactionsPerPage
-  );
+      const response = await axios.get('http://3.218.8.102/api/wallets/1', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
 
-  const failedTransactions = transactions.filter(
-    (transaction) => transaction.status === "Failed"
-  );
+      if (response.status !== 200) {
+        throw new Error('Network response was not ok');
+      }
 
-  // Pagination controls
-  const handlePageChange = (page) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.message);
     }
+  }
+);
+
+// Store configuration
+const store = configureStore({
+  reducer: {
+    wallet: walletSlice.reducer,
+  },
+});
+
+// Edit Wallet Page
+function EditWallet() {
+  const { id } = useParams();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const wallet = useSelector((state) => state.wallet.wallet);
+
+  useEffect(() => {
+    if (!wallet) {
+      dispatch(fetchWalletDetails());
+    }
+  }, [wallet, dispatch]);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // Add API PUT request here to save wallet changes.
+    alert('Wallet updated successfully!');
+    navigate('/');
   };
 
+  if (!wallet) {
+    return <div className="text-center mt-6">Loading...</div>;
+  }
+
   return (
-    <div className="min-h-screen bg-gray-100 py-8 px-4">
-      {/* Page Header */}
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-800 text-center mb-6">
-          Wallet Transactions
-        </h1>
-      </div>
-
-      {/* Transactions Section */}
-      <div className="max-w-7xl mx-auto bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-xl font-semibold text-gray-800 mb-4">
-          Transactions
-        </h2>
-        <div className="space-y-4">
-          {currentTransactions.map((transaction) => (
-            <div
-              key={transaction.id}
-              className={`p-4 border rounded-lg ${
-                transaction.status === "Failed"
-                  ? "bg-red-50 border-red-300"
-                  : "bg-green-50 border-green-300"
-              }`}
-            >
-              <p className="text-gray-800 font-medium">
-                {transaction.description}
-              </p>
-              <p className="text-gray-600">
-                Amount: <span className="font-bold">${transaction.amount}</span>
-              </p>
-              <p
-                className={`font-bold ${
-                  transaction.status === "Failed"
-                    ? "text-red-600"
-                    : "text-green-600"
-                }`}
-              >
-                Status: {transaction.status}
-              </p>
-            </div>
-          ))}
+    <div className="p-8">
+      <h1 className="text-2xl font-bold mb-4">Edit Wallet</h1>
+      <form onSubmit={handleSubmit}>
+        <div className="mb-4">
+          <label className="block text-gray-700">Name</label>
+          <input
+            type="text"
+            defaultValue={wallet.name}
+            className="border rounded px-4 py-2 w-full"
+          />
         </div>
-
-        {/* Pagination Controls */}
-        <div className="flex justify-between items-center mt-6">
-          <button
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-          >
-            Previous
-          </button>
-          <p className="text-gray-600">
-            Page {currentPage} of {totalPages}
-          </p>
-          <button
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
-          >
-            Next
-          </button>
+        <div className="mb-4">
+          <label className="block text-gray-700">Credit</label>
+          <input
+            type="number"
+            defaultValue={wallet.credit}
+            className="border rounded px-4 py-2 w-full"
+          />
         </div>
-      </div>
-
-      {/* Failed Transactions Section */}
-      <div className="max-w-7xl mx-auto bg-red-50 border border-red-300 rounded-lg shadow-md p-6 mt-8">
-        <h2 className="text-xl font-semibold text-red-800 mb-4">
-          Failed Transactions
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {failedTransactions.slice(0, 9).map((transaction) => (
-            <div key={transaction.id} className="p-4 bg-white rounded-lg shadow">
-              <p className="text-gray-800 font-medium">
-                {transaction.description}
-              </p>
-              <p className="text-gray-600">
-                Amount: <span className="font-bold">${transaction.amount}</span>
-              </p>
-              <p className="text-red-600 font-bold">Status: {transaction.status}</p>
-            </div>
-          ))}
+        <div className="mb-4">
+          <label className="block text-gray-700">Gift Card</label>
+          <input
+            type="number"
+            defaultValue={wallet.giftcard}
+            className="border rounded px-4 py-2 w-full"
+          />
         </div>
-      </div>
+        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
+          Save Changes
+        </button>
+      </form>
+    </div>
+  );
+}
 
-      {/* Report Failed Transactions */}
-      <div className="p-4">
-      < ReportTransactionCard />
+// Main Wallet Component
+function Wallet() {
+  const dispatch = useDispatch();
+  const { wallet, loading, error } = useSelector((state) => state.wallet);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    dispatch(fetchWalletDetails());
+  }, [dispatch]);
+
+  const handleUpdateClick = () => {
+    navigate(`/wallet/${wallet.id}/edit`);
+  };
+
+  if (loading) {
+    return <div className="text-center mt-6">Loading...</div>;
+  }
+
+  if (error) {
+    return <div className="text-center mt-6 text-red-600">Error: {error}</div>;
+  }
+
+  return (
+    <div className="bg-gray-100 min-h-screen flex flex-col items-center p-8">
+      <h1 className="text-4xl font-bold mb-8 text-center text-black">Wallet</h1>
+      <div>
+        <p><strong>Name:</strong> {wallet?.name}</p>
+        <p><strong>Credit:</strong> {wallet?.credit}</p>
+        <p><strong>Gift Card:</strong> {wallet?.giftcard}</p>
+      </div>
+      <div className="mt-4">
+        <button onClick={handleUpdateClick} className="bg-blue-500 text-white px-4 py-2 rounded">
+          Update Wallet
+        </button>
       </div>
     </div>
   );
-};
+}
 
-export default Wallet;
+// App Component with Routes
+function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Wallet />} />
+        <Route path="/wallet/:id/edit" element={<EditWallet />} />
+      </Routes>
+    </Router>
+  );
+}
+
+export default App;
+export { store };
