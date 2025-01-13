@@ -1,13 +1,14 @@
 
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import CreateUserForm from './CreateUser';
 
 function Users() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [formData, setFormData] = useState({ name: '', email: '', role: 'User' });
+  const [addingUser, setAddingUser] = useState(false);
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -51,6 +52,28 @@ function Users() {
     }
   };
 
+  const handleFormChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const newUser = { ...formData };
+      const response = await axios.post('http://3.218.8.102/api/admin/users', newUser);
+      setUsers((prevUsers) => [...prevUsers, response.data]);
+      setFormData({ name: '', email: '', role: 'User' });
+      alert('User added successfully.');
+      setAddingUser(false);
+    } catch (err) {
+      alert('Failed to add user: ' + err.message);
+    }
+  };
+
   if (loading) {
     return <div className="text-center mt-10">Loading...</div>;
   }
@@ -88,11 +111,68 @@ function Users() {
             >
               Delete
             </button>
-
           </li>
         ))}
       </ul>
-      <CreateUserForm />
+
+      {/* Add New User Section */}
+      {addingUser ? (
+        <form
+          onSubmit={handleFormSubmit}
+          className="bg-white shadow-md rounded-lg p-6 w-full max-w-md mt-6"
+        >
+          <h3 className="text-lg font-semibold mb-4">Add a New User</h3>
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-medium mb-2">Name</label>
+            <input
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleFormChange}
+              className="w-full px-4 py-2 border rounded-lg text-gray-700 focus:outline-none focus:ring focus:ring-blue-300"
+              placeholder="Enter user's name"
+              required
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-medium mb-2">Email</label>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleFormChange}
+              className="w-full px-4 py-2 border rounded-lg text-gray-700 focus:outline-none focus:ring focus:ring-blue-300"
+              placeholder="Enter user's email"
+              required
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-medium mb-2">Role</label>
+            <select
+              name="role"
+              value={formData.role}
+              onChange={handleFormChange}
+              className="w-full px-4 py-2 border rounded-lg text-gray-700 focus:outline-none focus:ring focus:ring-blue-300"
+            >
+              <option value="User">User</option>
+              <option value="Admin">Admin</option>
+            </select>
+          </div>
+          <button
+            type="submit"
+            className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition"
+          >
+            Add User
+          </button>
+        </form>
+      ) : (
+        <button
+          onClick={() => setAddingUser(true)}
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg mt-6 hover:bg-blue-700 transition"
+        >
+          Add New User
+        </button>
+      )}
     </div>
   );
 }
